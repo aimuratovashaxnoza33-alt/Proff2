@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Proff — kasb tanlashda AI yordamchi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#1c1c1e;--ink:#f4f3ee;--muted:#b4b2aa;--gold:#eab625;--gold-ink:#272727;
+--g:rgba(255,255,255,.09);--gb:rgba(255,255,255,.2);
+--head:"Montserrat","Arial Black","Segoe UI",system-ui,sans-serif;--body:"Manrope","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:400 16px/1.55 var(--body);overflow:hidden;
+background:radial-gradient(60% 50% at 15% 10%,rgba(234,182,37,.55),transparent 70%),radial-gradient(50% 45% at 90% 20%,rgba(255,112,67,.4),transparent 70%),radial-gradient(55% 50% at 70% 95%,rgba(64,150,255,.38),transparent 70%),radial-gradient(40% 40% at 5% 90%,rgba(170,90,255,.28),transparent 70%),var(--bg)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:rgba(28,28,30,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:50}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button{font:inherit;color:inherit}
+.glass{background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05));backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--gb);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.06),0 12px 40px rgba(0,0,0,.35);border-radius:28px}
+.btn{border:0;cursor:pointer;font-weight:700;background:var(--gold);color:var(--gold-ink);padding:13px 24px;border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 18px rgba(234,182,37,.35)}
+.btn:hover{filter:brightness(1.08)}
+.btn.alt{background:var(--g);color:var(--ink);border:1px solid var(--gb);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.btn[disabled]{opacity:.5;cursor:default}
+.view{display:none;height:100%;width:100%}
+body[data-view="landing"] #landing,body[data-view="auth"] #auth,body[data-view="welcome"] #welcome{display:flex}
+body[data-view="app"] #app{display:flex}
+.center{align-items:center;justify-content:center;padding:20px;flex-direction:column;gap:18px;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px;font:800 20px var(--head);letter-spacing:.08em}
+.logo img{width:34px;display:block}
+.card{width:min(520px,100%);padding:32px}
+h1{font:800 clamp(28px,6vw,42px)/1.12 var(--head);margin:0 0 14px}
+.lead{color:var(--muted);margin:0 0 24px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-size:14px;background:var(--g);border:1px solid var(--gb);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(0,0,0,.25);margin:0 0 20px}
+.tabs button{flex:1;border:0;background:none;padding:10px;border-radius:999px;cursor:pointer;color:var(--muted);font-weight:700}
+.tabs button[aria-selected="true"]{background:var(--g);color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+label{display:block;font-size:14px;color:var(--muted);margin:0 0 6px}
+.f{width:100%;background:rgba(0,0,0,.28);color:var(--ink);border:1px solid var(--gb);border-radius:16px;padding:13px 16px;font:inherit;margin:0 0 14px}
+.err{color:#ff9d8a;min-height:22px;margin:0 0 8px;font-size:14px}
+.small{font-size:13px;color:var(--muted);margin:14px 0 0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+/* app */
+#app{padding:12px;gap:12px}
+.side{width:300px;flex:none;display:flex;flex-direction:column;padding:16px;gap:6px;min-height:0;z-index:20}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.side .logo{margin:2px 4px 12px}
+.nb{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:16px;cursor:pointer;color:var(--ink)}
+.nb:hover,.nb.on{background:var(--g);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.nb.new{background:var(--gold);color:var(--gold-ink);font-weight:700;margin-bottom:6px}
+.lab{font-size:12px;color:var(--muted);margin:12px 12px 2px}
+.list{flex:1;overflow-y:auto;min-height:60px}
+.ci{display:flex;align-items:center;gap:4px}
+.ci .nb{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.ic{border:0;background:none;cursor:pointer;color:var(--muted);padding:8px;border-radius:12px;font-size:13px}
+.ic:hover{background:var(--g);color:var(--ink)}
+.me{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--gb);padding-top:12px;font-size:14px}
+.me span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.top{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--gb)}
+.top h2{font:700 17px var(--head);margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menu{display:none}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.b{max-width:min(620px,86%);padding:12px 16px;border-radius:22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.b.ai{background:var(--g);border:1px solid var(--gb);align-self:flex-start;border-bottom-left-radius:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.b.me{background:var(--gold);color:var(--gold-ink);align-self:flex-end;border-bottom-right-radius:6px;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 10px}
+.send{display:flex;gap:10px;padding:12px 16px 16px;align-items:center}
+.send .f{margin:0;flex:1;min-width:0;border-radius:999px}
+.send .btn{padding:13px 20px}
+.scrim{display:none}
+@media (max-width:760px){
+  #app{padding:8px}
+  .side{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);bottom:calc(env(safe-area-inset-bottom,0px) + 8px);left:8px;width:min(310px,86vw);transform:translateX(-120%);transition:transform .25s}
+  .side.open{transform:none}
+  .scrim.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15}
+  .menu{display:block}
+  .b{max-width:92%}
+}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
+</style>
+</head>
+<body data-view="landing">
+
+<section class="view center" id="landing">
+  <div class="logo"><img class="mk" src="logo.png" alt="">PROFF</div>
+  <div class="glass card" style="text-align:center">
+    <h1>Bolangiz qaysi kasbda o‘zini topadi?</h1>
+    <p class="lead">AI bolaning xarakteri, qiziqishi va qobiliyatiga mos zamonaviy kasblarni topishga yordam beradi.</p>
+    <div class="row" style="justify-content:center"><button class="btn" data-go="auth">Boshlash</button></div>
+  </div>
+  <div class="pills"><span class="pill">Bolalar 8–12</span><span class="pill">O‘smirlar 13–17</span><span class="pill">Ota-onalar</span></div>
+</section>
+
+<section class="view center" id="auth">
+  <div class="logo"><img class="mk" src="logo.png" alt="">PROFF</div>
+  <div class="glass card">
+    <h1 style="font-size:26px">Proff’ga kirish</h1>
+    <button class="btn alt" id="goog" style="width:100%;margin:0 0 18px">Google bilan davom etish</button>
+    <label for="em">yoki email orqali</label>
+    <input class="f" id="em" type="email" inputmode="email" autocomplete="email" placeholder="ism@pochta.uz">
+    <div id="cw" hidden><label for="cd">Pochtaga kelgan kod</label><input class="f" id="cd" inputmode="numeric" maxlength="8" autocomplete="one-time-code"></div>
+    <p class="err" id="err" role="alert"></p>
+    <button class="btn" id="sub" style="width:100%">Kod yuborish</button>
+    <p class="small">Parol kerak emas. Emailingizga bir martalik kod yuboramiz.</p>
+  </div>
+</section>
+
+<section class="view center" id="welcome">
+  <div class="glass card" style="text-align:center">
+    <h1 id="hi">Salom!</h1>
+    <p class="lead">Proff AI tayyor. Suhbatni boshlang yoki kerakli bo‘limni tanlang.</p>
+    <div class="row" style="justify-content:center">
+      <button class="btn" id="start">Suhbatni boshlash</button>
+      <button class="btn alt" id="startAdv">Maslahatchi</button>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="app">
+  <div class="scrim" id="scrim"></div>
+  <aside class="glass side" id="side">
+    <div class="logo"><img class="mk" src="logo.png" alt="">PROFF</div>
+    <button class="nb new" id="nw">＋ Yangi suhbat</button>
+    <div class="lab">Bo‘limlar</div>
+    <button class="nb" data-mode="advisor">💡 Maslahatchi</button>
+    <button class="nb" data-mode="quiz">🧩 Kasb testi</button>
+    <button class="nb" data-mode="parent">👨‍👩‍👧 Ota-onalar uchun</button>
+    <div class="lab">Suhbatlar</div>
+    <div class="list" id="list"></div>
+    <button class="nb" id="arcBtn" aria-expanded="false">🗂 Arxiv <span id="arcN"></span></button>
+    <div class="list" id="arc" hidden style="flex:none;max-height:28%"></div>
+    <div class="me"><span id="who"></span><button class="ic" id="out">Chiqish</button></div>
+  </aside>
+  <div class="glass main">
+    <div class="top">
+      <button class="ic menu" id="menu" aria-label="Menyu">☰</button>
+      <h2 id="ttl">Yangi suhbat</h2>
+    </div>
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <div class="send">
+      <input class="f" id="inp" maxlength="500" placeholder="Xabaringizni yozing" aria-label="Xabar">
+      <button class="btn" id="go">Yuborish</button>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+var C=window.PROFF||{},$=function(s){return document.querySelector(s)};
+var sb=window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
+var CH={
+career:{n:"Kasb aniqlash",hello:"Salom! Men Proff AIman. Bo‘sh vaqtingda nima qilishni yaxshi ko‘rasan?",ch:["Rasm chizishni yaxshi ko‘raman","Kompyuter o‘yinlarini yaxshi ko‘raman","Hali bilmayman"]},
+advisor:{n:"Maslahatchi",hello:"Salom! Men Proff maslahatchisiman. O‘qish, imtihon, universitet yoki o‘zingga ishonch haqida nima so‘ramoqchisan?",ch:["Qaysi fanlarga e’tibor berish kerak?","O‘qishga motivatsiya topolmayapman","Universitetni qanday tanlayman?"]},
+quiz:{n:"Kasb testi",hello:"Boshlaymiz! 8 ta qisqa savol bo‘ladi. Birinchisi: bo‘sh vaqtingda nimani tanlaysan?\nA) Biror narsa yasash\nB) Odamlarga yordam berish\nC) Yangi narsani tahlil qilish",ch:["A","B","C"]},
+parent:{n:"Ota-onalar uchun",hello:"Salom! Farzandingiz haqida gapirib bering: yoshi nechada va nimaga qiziqadi?",ch:["Farzandim 14 yoshda, kompyuterga qiziqadi","Farzandim nimaga qiziqishini bilmayman","Farzandimni qanday qo‘llab-quvvatlayman?"]}
+};
+var cur=null,chats=[],act=null,busy=false,codeStep=false;
+function view(v){document.body.setAttribute('data-view',v)}
+function save(c){return sb.from('chats').upsert({id:c.id,mode:c.mode,title:c.title,msgs:c.msgs,arch:c.arch,ts:c.ts})}
+document.addEventListener('click',function(e){var g=e.target.closest('[data-go]');if(g)view(g.dataset.go)});
+async function enter(user){
+  if(cur&&cur.id===user.id)return;
+  cur=user;var md=user.user_metadata||{};
+  $('#hi').textContent='Salom, '+(md.full_name||md.name||(user.email||'').split('@')[0]||'do‘st')+'!';
+  $('#who').textContent=user.email||'';
+  var r=await sb.from('chats').select('*').order('ts',{ascending:false});
+  chats=r.data||[];
+  var v=document.body.getAttribute('data-view');if(v==='landing'||v==='auth')view('welcome');
+}
+async function msg(t){$('#err').textContent=t}
+async function submit(){
+  var em=$('#em').value.trim().toLowerCase();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){msg('Email manzilni to‘g‘ri kiriting.');return}
+  $('#sub').disabled=true;msg('');var r;
+  if(!codeStep){
+    r=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin}});
+    if(r.error)msg('Kod yuborilmadi. Birozdan keyin urinib ko‘ring.');
+    else{codeStep=true;$('#cw').hidden=false;$('#sub').textContent='Tasdiqlash';msg('Pochtangizga havola va kod yubordik. Havolani bosing yoki kodni kiriting.')}
+  }else{
+    r=await sb.auth.verifyOtp({email:em,token:$('#cd').value.trim(),type:'email'});
+    if(r.error)msg('Kod noto‘g‘ri yoki eskirgan.');
+  }
+  $('#sub').disabled=false;
+}
+$('#sub').onclick=submit;$('#em').onkeydown=function(e){if(e.key==='Enter')submit()};
+$('#goog').onclick=function(){sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin}})};
+$('#out').onclick=async function(){await sb.auth.signOut();cur=null;act=null;chats=[];codeStep=false;view('landing')};
+sb.auth.onAuthStateChange(function(ev,s){if(s&&s.user)setTimeout(function(){enter(s.user)},0)});
+function open(){$('#side').classList.add('open');$('#scrim').classList.add('open')}
+function close(){$('#side').classList.remove('open');$('#scrim').classList.remove('open')}
+$('#menu').onclick=open;$('#scrim').onclick=close;
+function newChat(m){var c={id:crypto.randomUUID(),mode:m,title:CH[m].n,msgs:[{r:'ai',t:CH[m].hello}],arch:false,ts:Date.now()};chats.unshift(c);save(c);show(c)}
+function openMode(m){var c=chats.filter(function(x){return x.mode===m&&!x.arch})[0];c?show(c):newChat(m)}
+function bub(t,c){var d=document.createElement('div');d.className='b '+c;d.textContent=t;$('#msgs').appendChild(d);$('#msgs').scrollTop=1e9;return d}
+function show(c){
+  act=c;view('app');close();$('#ttl').textContent=c.title;$('#msgs').textContent='';
+  c.msgs.forEach(function(m){bub(m.t,m.r)});
+  var ch=$('#chips');ch.textContent='';
+  if(c.msgs.length<2)CH[c.mode].ch.forEach(function(t){var b=document.createElement('button');b.className='pill';b.textContent=t;b.onclick=function(){send(t)};ch.appendChild(b)});
+  side();
+}
+function item(c,arch){
+  var w=document.createElement('div');w.className='ci';
+  var b=document.createElement('button');b.className='nb'+(act&&act.id===c.id?' on':'');b.textContent=c.title;b.onclick=function(){show(c)};w.appendChild(b);
+  var a=document.createElement('button');a.className='ic';a.textContent=arch?'Qaytarish':'Arxivlash';
+  a.onclick=function(){c.arch=!arch;save(c);if(act&&act.id===c.id&&c.arch){act=null;var n=chats.filter(function(x){return !x.arch})[0];n?show(n):newChat('career')}else side()};w.appendChild(a);
+  if(arch){var d=document.createElement('button');d.className='ic';d.textContent='O‘chirish';d.onclick=function(){chats=chats.filter(function(x){return x.id!==c.id});sb.from('chats').delete().eq('id',c.id);side()};w.appendChild(d)}
+  return w;
+}
+function side(){
+  var l=$('#list'),r=$('#arc');l.textContent='';r.textContent='';
+  var live=chats.filter(function(c){return !c.arch}),old=chats.filter(function(c){return c.arch});
+  live.forEach(function(c){l.appendChild(item(c,false))});old.forEach(function(c){r.appendChild(item(c,true))});
+  $('#arcN').textContent=old.length?'('+old.length+')':'';
+}
+$('#arcBtn').onclick=function(){var r=$('#arc');r.hidden=!r.hidden;this.setAttribute('aria-expanded',!r.hidden)};
+$('#nw').onclick=function(){newChat('career')};
+document.querySelectorAll('[data-mode]').forEach(function(b){b.onclick=function(){openMode(b.dataset.mode)}});
+$('#start').onclick=function(){newChat('career')};$('#startAdv').onclick=function(){openMode('advisor')};
+async function send(text){
+  text=(text||'').trim();if(!text||busy||!act)return;
+  var c=act;busy=true;$('#go').disabled=true;$('#inp').value='';$('#chips').textContent='';
+  if(c.msgs.length<2){c.title=text.slice(0,30);$('#ttl').textContent=c.title}
+  c.msgs.push({r:'me',t:text});c.ts=Date.now();bub(text,'me');var bb=bub('…','ai');
+  try{
+    var s=(await sb.auth.getSession()).data.session;
+    var r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+(s?s.access_token:'')},body:JSON.stringify({mode:c.mode,messages:c.msgs.slice(-14)})});
+    if(r.status===429){bb.textContent='Bugungi limit tugadi. Ertaga davom ettiramiz.';c.msgs.pop()}
+    else if(!r.ok){bb.textContent='Javob olinmadi. Keyinroq urinib ko‘ring.';c.msgs.pop()}
+    else{var d=await r.json();bb.textContent=d.text;c.msgs.push({r:'ai',t:d.text})}
+  }catch(e){bb.textContent='Aloqa uzildi. Internetni tekshiring.';c.msgs.pop()}
+  save(c);side();busy=false;$('#go').disabled=false;
+}
+$('#go').onclick=function(){send($('#inp').value)};$('#inp').onkeydown=function(e){if(e.key==='Enter')send(this.value)};
+sb.auth.getSession().then(function(r){if(r.data.session)enter(r.data.session.user)});
+})();
+</script>
+</body>
+</html>
